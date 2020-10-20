@@ -1,3 +1,4 @@
+from django.db import connection
 from django.shortcuts import render
 from django.conf import settings
 from .models import *
@@ -23,6 +24,19 @@ def index(request):
     article_list=Article.objects.all()
     # 分页 -> 分页对象
     paginnator=Paginator(article_list,1)
+    # 文章归档数据
+    # cursor.execute 方法执行sql
+    # select_sql="SELECT DISTINCT DATE_FORMAT(date_publish,'%Y-%m') as col_date FROM blog_article ORDER BY date_publish"
+    # cursor=connection.cursor()
+    # cursor.execute(select_sql)
+    # archive_list=cursor.fetchall()
+
+    # raw 方法执行SQL
+    # select_sql="SELECT DISTINCT DATE_FORMAT(date_publish,'%%Y-%%m') as col_date,id FROM blog_article ORDER BY date_publish"
+    # archive_list=Article.objects.raw(select_sql)
+    # print(archive_list)
+    # 4.使用自定义模型管理器类方法
+    archive_list=Article.objects.distinct_date()
     try:
         # 得到页码对象，没传默认返回1
         page=int(request.GET.get('page',1))
@@ -31,4 +45,4 @@ def index(request):
     except (EmptyPage,InvalidPage,PageNotAnInteger):
         # 异常错误默认返回第1页
         article_list=paginnator.page(1)
-    return render(request,'index.html',{'category_list':category_list,'article_list':article_list})
+    return render(request,'index.html',{'category_list':category_list,'article_list':article_list,"archive_list":archive_list})

@@ -46,17 +46,16 @@ class Category(models.Model):
         return self.name
 
 # 自定义一个文章Model的管理器
-# 1、新加一个数据处理的方法
-# 2、改变原有的queryset
-# class ArticleManager(models.Manager):
-#     def distinct_date(self):
-#         distinct_date_list = []
-#         date_list = self.values('date_publish')
-#         for date in date_list:
-#             date = date['date_publish'].strftime('%Y/%m文章存档')
-#             if date not in distinct_date_list:
-#                 distinct_date_list.append(date)
-#         return distinct_date_list
+# 1、新加一个数据处理的方法->2、改变原有的queryset
+class ArticleManager(models.Manager):
+    def distinct_date(self):
+        distinct_date_list = []
+        date_list = self.values('date_publish')
+        for date in date_list:
+            date = date['date_publish'].strftime('%Y/%m')
+            if date not in distinct_date_list:
+                distinct_date_list.append(date)
+        return distinct_date_list
 
 # 文章模型
 class Article(models.Model):
@@ -69,8 +68,8 @@ class Article(models.Model):
     user = models.ForeignKey(User, verbose_name='用户',on_delete=models.DO_NOTHING)
     category = models.ForeignKey(Category, blank=True, null=True, verbose_name='分类',on_delete=models.DO_NOTHING)
     tag = models.ManyToManyField(Tag, verbose_name='标签')
-
-    # objects = ArticleManager()
+    # 3. 引用自定义模型管理器类方法
+    objects = ArticleManager()
 
     class Meta:
         verbose_name = '文章'
