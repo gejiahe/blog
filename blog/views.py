@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.conf import settings
 from .models import *
 from django.core.paginator import Paginator,InvalidPage,EmptyPage,PageNotAnInteger
+from django.db.models import Count
 # Create your views here.
 
 # 全局变量配置-返回函数
@@ -20,7 +21,17 @@ def global_setting(request):
     # 文章归档
     archive_list = Article.objects.distinct_date()
     # 广告数据
+
+    # 评论排行
+    comment_count_list = Comment.objects.values('article','user').annotate(comment_count=Count('article')).order_by("-comment_count")
+    # comment_count_list = Comment.objects.values('article','user').annotate(Count('article'))
+    # 下面为聚合函数查询结果
+    # < QuerySet[{'article': 1, 'user': None, 'article__count': 1}, {'article': 2, 'user': 2, 'article__count': 1}, {'article': 3,'user': 1,'article__count': 2}] >
+    # print(comment_count_list)
+    article_comment_list=[Article.objects.get(pk=comment['article']) for comment in comment_count_list ]
     return locals()
+
+
 
 
 def index(request):
