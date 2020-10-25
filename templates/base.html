@@ -92,7 +92,7 @@ window.onload = function ()
         <div  class="bd bd-news">
           <ul>
               {% for article in  article_comment_list %}
-                <li><a href="/" target="_blank">{{ article.title }}</a></li>
+                <li><a href="{% url 'article' %}?pk={{ article.id }}" target="_blank">{{ article.title }}</a></li>
               {% endfor %}
           </ul>
         </div>
